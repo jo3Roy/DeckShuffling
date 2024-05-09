@@ -1,0 +1,100 @@
+# your code goes here
+
+import random
+
+
+class Card:
+	def __init__(self, suite, num):
+		self.suite = suite
+		self.num = num
+	def __repr__(self):
+		return "<suite: " + self.suite + ", num: " + str(self.num) + ">"
+		
+	def __lt__(a, b):
+		return a.num < b.num
+	
+	def __gt__(a, b):
+		return a.num > b.num
+
+
+def createDeck():
+	deck = []
+	for suite in ["a", "b"]:
+		for i in range(1,14):
+			deck.append(Card(suite,i))
+	for suite in [ "c", "d"]:
+		for i in range(1,14):
+			deck.append(Card(suite,14-i))
+	return deck
+	
+
+def shuffle(deck):
+
+	k = 7
+	piles = []
+	for i in range(k):
+		piles.append([])
+	for idx, card in enumerate(deck):
+
+		piles[(idx % k)].append(card)
+
+	t = k - 1
+	while(t > 0):
+		
+		for idx, card in enumerate(piles[t]):
+			piles[(idx % t)].append(card)
+			
+		t = t - 1
+	#print(piles[0])
+		
+	return piles[0]
+			
+		
+def counterRisingSequences(l):
+	c = 0
+	last = None
+	if len(l) < 2:
+		return 1
+	
+
+	for idx, card in enumerate(l):
+		if idx == 0:
+			continue
+		last = l[idx-1]
+		curr = l[idx]
+		if last > curr:
+			c = c+1
+
+	return c + 1
+	
+
+
+def measureRandomness(shuffled, deck):
+	suite_a = [card for card in shuffled if card.suite == "a"]
+	#print(suite_a)
+	suite_b = [card for card in shuffled if card.suite == "b"]
+	suite_c = [card for card in shuffled if card.suite == "c"]
+	suite_d = [card for card in shuffled if card.suite == "d"]
+	return counterRisingSequences(suite_a) + counterRisingSequences(suite_b) + counterRisingSequences(suite_c) + counterRisingSequences(suite_d) 
+	 
+	
+def shuffleRand(deck):
+	shuffled_list = sorted(deck, key=lambda x: random.random())
+	return shuffled_list
+
+deck = createDeck()
+
+shuffled = shuffle(deck)
+score = measureRandomness(shuffled, deck)
+
+runs = 50
+total = 0 
+deck2 = createDeck()
+for i in range(runs):
+	deck_rand = shuffleRand(deck2)
+	score_rand = measureRandomness(deck_rand, deck_rand)
+	total = total + score_rand
+avgRand = total / runs
+
+print("my shuffle number of rising sequencens in each suite combined :" , score)
+print("50 iterations average of the same measurement but the shuffle is random: ", avgRand)
